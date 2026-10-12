@@ -1,0 +1,4 @@
+package org.bukkit.plugin;
+import org.bukkit.event.Event;
+import org.bukkit.event.Listener;
+public interface EventExecutor { void execute(Listener listener, Event event); }

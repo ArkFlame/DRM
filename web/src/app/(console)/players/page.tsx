@@ -1,0 +1,8 @@
+import { backend } from '@/lib/backend';
+import { PageHeading, Placeholder, Presence, RowLink, SearchBar, Section, Time, Warning } from '@/components/ui';
+import type { Player } from '@/lib/types';
+export default async function Players({searchParams}:{searchParams:Promise<{q?:string}>}){
+ const {q=''}=await searchParams;const data=await backend<Player[]>(`/api/admin/v2/players?q=${encodeURIComponent(q.slice(0,100))}`);
+ return <><PageHeading eyebrow="Identity / Opt-in directory" title="Players" desc="Minecraft account profiles observed by participating nodes. Player presence and OP indicators are provisional and collected only where the operator enabled these telemetry categories."/><div className="mb-5"><Warning>Profile associations must remain administrator-only. Do not infer that a player operates or owns every server on which their UUID appears.</Warning></div><div className="mb-5"><SearchBar placeholder="Search player username or UUID" defaultValue={q}/></div>
+ <Section title={`${data.length} player profiles`} subtitle="Most recently observed first; up to 1,000 matching records shown.">{data.length?<div className="overflow-x-auto"><table className="table"><thead><tr><th>Player</th><th>UUID</th><th>Nodes</th><th>Last reported</th><th>Presence</th></tr></thead><tbody>{data.map(p=><tr key={p.uuid}><td><RowLink href={`/player/${p.uuid}`}>{p.name}</RowLink></td><td className="monos subtle">{p.uuid}</td><td>{Object.keys(p.nodes).length}</td><td><Time at={p.lastSeen}/></td><td><Presence online={p.online}/></td></tr>)}</tbody></table></div>:<Placeholder>No player records found. Player collection must be opted in by server owners.</Placeholder>}</Section></>;
+}

@@ -1,0 +1,13 @@
+web/.env
+web/.env.local
+web/.env.*.local
+web/.next/
+web/node_modules/
+web/tsconfig.tsbuildinfo
+web/data/
+data/
+client/target/
+client/build/
+client/.gradle/
+.local-test/
+dist/

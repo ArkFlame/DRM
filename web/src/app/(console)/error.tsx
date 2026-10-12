@@ -1,0 +1,2 @@
+'use client';
+export default function ErrorBoundary({error,reset}:{error:Error & {digest?:string};reset:()=>void}) {return <div className="panel p-9"><h1 className="text-2xl font-bold">Unable to load telemetry</h1><p className="subtle mt-2">Verify that the DRM backend is running, localhost endpoints are accessible, and administrator credentials match. {error.digest ? `Incident ${error.digest}` : ''}</p><button className="btn btn-sm mt-5 bg-[#fa6044] text-black border-none" onClick={reset}>Retry request</button></div>}

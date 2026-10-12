@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { equalSecret, makeCookie, verifyCookie, sessionTtlSeconds } from '../src/lib/session-crypto.mjs';
+const secret='S'.repeat(64), epoch=1791732000;
+test('signed session verified until expiry',()=>assert.equal(verifyCookie(makeCookie(secret,epoch),secret,epoch+120),true));
+test('expired session rejected',()=>assert.equal(verifyCookie(makeCookie(secret,epoch),secret,epoch+sessionTtlSeconds),false));
+test('tampered session rejected',()=>assert.equal(verifyCookie(makeCookie(secret,epoch).replace(/.$/,'b'),secret,epoch),false));
+test('mismatched secret rejected',()=>assert.equal(verifyCookie(makeCookie(secret,epoch),'Q'.repeat(64),epoch),false));
+test('future stamped session rejected',()=>assert.equal(verifyCookie(makeCookie(secret,epoch+1000),secret,epoch),false));
+test('constant length-hash comparison distinguishes credentials',()=>assert.equal(equalSecret('longsecret','othersecret'),false));

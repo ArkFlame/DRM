@@ -1,0 +1,13 @@
+import { backend } from '@/lib/backend';
+import { PolicyActions } from '@/components/actions';
+import { EmptyValue, PageHeading, Pair, Placeholder, Presence, RowLink, Section, Status, Time, Warning } from '@/components/ui';
+import type { NetworkData, NodeSummary } from '@/lib/types';
+import { notFound } from 'next/navigation';
+export default async function NetworkPage({params}:{params:Promise<{id:string}>}){
+ const {id}=await params;const data=await backend<{network:NetworkData|undefined;nodes:NodeSummary[]}>(`/api/admin/v2/network?id=${encodeURIComponent(id)}`);
+ if(!data.network)notFound();const n=data.network;
+ return <><PageHeading eyebrow="Infrastructure / Network detail" title={n.observedIp} desc="Transport-level network group. Different nodes sharing this address may be unrelated operators."/><Warning>Last successful server ping, MOTD and favicon are not available. No endpoint has been verified or probed, to avoid unsafe scanning.</Warning>
+ <div className="grid grid-cols-1 xl:grid-cols-[1fr_1.2fr] gap-5 mt-5"><Section title="Network summary"><dl className="p-5"><Pair label="Observed IP"><span className="monos">{n.observedIp}</span></Pair><Pair label="Known nodes">{n.nodes}</Pair><Pair label="Currently reporting">{n.online}</Pair><Pair label="Suspicious plugin markers"><span className={n.suspiciousPlugins ? "text-rose-300 font-semibold" : "subtle"}>{n.suspiciousPlugins}</span></Pair><Pair label="Last seen"><Time at={n.lastSeen}/></Pair><Pair label="Effective network review"><Status value={n.policy.status}/></Pair><Pair label="MOTD & icon"><EmptyValue/></Pair></dl></Section>
+ <Section title="Administrative policy" subtitle="Only labels review status. Does not disable plugins."><PolicyActions scope="network" id={n.id} policy={n.policy}/></Section></div>
+ <div className="mt-5"><Section title="Nodes associated with this address" subtitle="Individual node identities; shared-IP nodes remain separate records.">{data.nodes.length?<div className="overflow-x-auto"><table className="table"><thead><tr><th>Node ID</th><th>Port</th><th>State</th><th>Last seen</th><th>Suspicious</th><th>Review</th></tr></thead><tbody>{data.nodes.map(node=><tr key={node.id}><td className="monos"><RowLink href={`/node/${node.id}`}>{node.id.slice(0,12)}…</RowLink></td><td>{node.port||'—'}</td><td><Presence online={node.online}/></td><td><Time at={node.lastSeen}/></td><td>{node.suspiciousPlugins ? <span className="plugin-tag plugin-suspect">{node.suspiciousPlugins}</span> : <span className="subtle">0</span>}</td><td><Status value={node.policy.status}/></td></tr>)}</tbody></table></div>:<Placeholder/>}</Section></div></>;
+}

@@ -1,0 +1,2 @@
+import Link from 'next/link';
+export default function NotFound(){return <main className="min-h-screen flex items-center justify-center"><div className="text-center"><p className="text-[#fa806a] text-xs font-bold">404 / UNKNOWN RECORD</p><h1 className="text-2xl font-bold mt-3">Record not found</h1><p className="subtle mt-2">No matching server, node or player exists.</p><Link className="btn btn-sm mt-5" href="/">Back to overview</Link></div></main>}

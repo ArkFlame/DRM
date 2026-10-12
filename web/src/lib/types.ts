@@ -1,0 +1,13 @@
+export type PolicyState = 'NONE' | 'ALLOW' | 'BLOCK' | 'REVIEW';
+export type Policy = { status: PolicyState; reason: string; updatedAt?: string; scope?: string };
+export type InstalledPlugin = { name: string; version: string; fileName?: string; drm?: boolean; suspicious?: boolean };
+export type HistoryPoint = { time: number; players: number | null; servers: number | null };
+export type Operator = { uuid: string; name: string; source: string };
+export type ProductSession = { key: string; sessionId: string; nodeId: string; productId: string; productVersion: string; installationId: string; startedAt: string; lastSeen: string; stoppedAt: string; sequence: number; onlinePlayers: Record<string, boolean> };
+export type NodeData = { id: string; firstSeen: string; lastSeen: string; observedIp: string; ipHistory: string[]; serverVersion: string; port: number; maxPlayers: number; machine: { os: string; arch: string; processors: number } | null; plugins: InstalledPlugin[]; pluginSignals: InstalledPlugin[]; suspiciousPlugins:number; operators: Operator[]; players: Record<string, { firstSeen: string; lastSeen: string; op: boolean }>; online: boolean; onlinePlayers: number; products: string[]; activeProducts: string[]; sessions: ProductSession[]; policy: Policy; uptime: number };
+export type NodeSummary = Pick<NodeData, "id" | "observedIp" | "port" | "lastSeen" | "firstSeen" | "online" | "onlinePlayers" | "products" | "activeProducts" | "policy" | "uptime"> & {playerCount:number; suspiciousPlugins:number};
+export type NetworkData = { id: string; observedIp: string; nodes: number; online: number; suspiciousPlugins: number; lastSeen: string; policy: Policy };
+export type Overview = { networks: NetworkData[]; nodes: NodeSummary[]; history: HistoryPoint[]; stats: { networks: number; nodes: number; online: number; onlinePlayers: number; suspiciousPlugins: number; flaggedNodes: number; flaggedNetworks: number; players: number; installations: number } };
+export type Player = { uuid: string; name: string; firstSeen: string; lastSeen: string; online: boolean; nodes: Record<string, { op: boolean; lastSeen: string }>; connections?: { nodeId: string; op: boolean; lastSeen: string; nodeIp: string; online: boolean }[] };
+export type Installation = { productId: string; installationId: string; observedIp: string; lastSeen: string; productVersion: string; serverVersion: string; entitlement: string; licenseEvidence: string; sharedDownloadInstallations: number; manualStatus: PolicyState; manualReason: string };
+export type AuditEntry = { at: string; scope?: string; id?: string; productId?: string; installationId?: string; status: string; reason: string };

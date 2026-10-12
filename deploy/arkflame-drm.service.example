@@ -1,0 +1,31 @@
+# Adapt paths/user/node binary to your host. Only ONE instance may write web/data.
+# sudo install -m 644 deploy/arkflame-drm.service.example /etc/systemd/system/arkflame-drm.service
+[Unit]
+Description=ArkFlame DRM advisory console (single writer)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=arkflame
+Group=arkflame
+WorkingDirectory=/opt/arkflame-drm/web
+ExecStart=/opt/arkflame-drm/scripts/start.sh
+Restart=on-failure
+RestartSec=5s
+StartLimitIntervalSec=120
+StartLimitBurst=5
+UMask=0077
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/opt/arkflame-drm/web/data
+# Place generated .env before starting; start.sh will not rewrite an existing file.
+Environment=NODE_ENV=production
+Environment=PORT=3000
+Environment=HOSTNAME=127.0.0.1
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target
