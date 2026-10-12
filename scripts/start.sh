@@ -19,9 +19,6 @@ if ! ready; then
 fi
 if [ ! -f web/.env ]; then ./scripts/init-env.sh; fi
 cd web
-set -a
-. ./.env
-set +a
 export PORT="${PORT:-3000}"
 export HOSTNAME="${HOSTNAME:-127.0.0.1}"
-exec node .next/standalone/server.js
+exec node --env-file=.env .next/standalone/server.js

@@ -1,4 +1,4 @@
-# ArkFlame DRM architecture v0.6.4
+# ArkFlame DRM architecture v0.6.5
 
 ## Components and authority
 

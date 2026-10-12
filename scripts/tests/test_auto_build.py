@@ -32,11 +32,11 @@ class AutomaticBuildTests(unittest.TestCase):
             'mvn': '''#!/bin/sh
 printf '%s\\n' "$*" >> mvn.log
 mkdir -p client/target
-printf 'fixture jar' > client/target/arkflame-drm-client-0.6.4.jar
+printf 'fixture jar' > "client/target/arkflame-drm-client-${DRM_TEST_VERSION}.jar"
 ''',
             'java': '#!/bin/sh\nexit 0\n',
             'node': '''#!/bin/sh
-if [ "$1" = '.next/standalone/server.js' ]; then
+if [ "$1" = '--env-file=.env' ] && [ "$2" = '.next/standalone/server.js' ]; then
   echo SERVER_STARTED
 fi
 ''',
@@ -58,7 +58,7 @@ fi
             path = self.root / 'bin' / name
             path.write_text(content)
             path.chmod(0o755)
-        self.env = {**os.environ, 'PATH': str(self.root / 'bin') + os.pathsep + os.environ['PATH']}
+        self.env = {**os.environ, 'DRM_TEST_VERSION': self.version, 'PATH': str(self.root / 'bin') + os.pathsep + os.environ['PATH']}
 
     def command(self, script, **environment):
         return subprocess.run(['bash', f'scripts/{script}.sh'], cwd=self.root,
@@ -113,6 +113,18 @@ fi
         self.assertIn('SERVER_STARTED', result.stdout)
         self.assertFalse((self.root / 'mvn.log').exists())
         self.assertFalse((self.root / 'npm.log').exists())
+
+    def test_start_does_not_execute_env_as_shell_code(self):
+        out = self.root / 'web/.next/standalone'
+        out.mkdir(parents=True)
+        (out / 'server.js').write_text('// pre-built')
+        (out / '.build-complete').write_text(f'version={self.version}\n')
+        (self.root / 'web/.env').write_text('DRM_WEB_PASSWORD=$(touch injected-file)\n')
+        result = self.command('start')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn('SERVER_STARTED', result.stdout)
+        self.assertFalse((self.root / 'web/injected-file').exists())
+        self.assertFalse((self.root / 'injected-file').exists())
 
     def test_start_rebuilds_stale_previous_release(self):
         out = self.root / 'web/.next/standalone'

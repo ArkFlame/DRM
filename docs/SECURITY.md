@@ -1,6 +1,6 @@
 # Security and privacy — v0.6.3
 
-- One Next.js Node server contains API and dashboard. Sensitive dashboard and management routes use signed HttpOnly SameSite=Strict sessions, password comparison by constant-time SHA-256 digest, per-process rate limits and exact configured-origin checks on mutations.
+- One Next.js Node server contains API and dashboard. Sensitive dashboard and management routes use signed HttpOnly SameSite=Strict sessions, password comparison by constant-time SHA-256 digest, per-process rate limits and same-origin checks on mutations (configured origin or actual host through trusted ingress).
 - Generated `web/.env` stores `DRM_WEB_PASSWORD`, `DRM_WEB_SESSION_SECRET`, and `DRM_HASH_KEY`. File permissions 0600, Git-ignored. Password recoverable locally by owner; no universal password. Password alone is weaker than MFA: restrict the administrator console using VPN / identity-aware reverse proxy for public deployment.
 - The ingestion endpoints have no cryptographic client authenticity. Event payloads and claimed player/operator/plugin/machine data are **unverified** observations, not legal or enforcement proof. Do not make blacklist decisions automatically.
 - Real IP is accepted only from a trusted TLS terminator that replaces `X-Real-IP`; never expose the Node process publicly. Hostname grouping can include NAT, reverse proxies, hosting clusters and VPNs.
@@ -22,3 +22,5 @@ A green DRM indicator means a matching product has an active, recently reporting
 ### v0.6.3 license evidence and opt-in
 
 Without `BBB_EMBED_TOKEN`, rights lookups are **not configured**; v1/v2 telemetry continues fail-open, with no automatic ban or remote disablement. With a token, a nonce usage-rights result is **not product-specific verification** because the claimed Bukkit product identifier is not yet authoritatively bound to the provider resource. The service no longer propagates a nonce-rights result across different claimed product names, but copied/fabricated nonce and telemetry remain spoofable. The dashboard labels those uncertainty tiers. Provider requests are never issued without a configured token.
+
+The password verifier accepts a nonempty operator-configured password exactly as written, without a hidden minimum-length rejection. Generate a strong random password and protect the `.env` file. In production, use HTTPS and an additional VPN or identity-aware proxy. Startup loads `.env` using `node --env-file=.env`, not shell expansion. Only trust forwarded scheme from a proxy that overwrites inbound headers; protect the loopback-only Node port.

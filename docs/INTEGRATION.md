@@ -13,7 +13,7 @@
   <dependency>
     <groupId>com.arkflame</groupId>
     <artifactId>arkflame-drm-client</artifactId>
-    <version>0.6.4</version>
+    <version>0.6.6</version>
   </dependency>
 </dependencies>
 ```
@@ -48,7 +48,7 @@ repositories {
     mavenCentral()
 }
 dependencies {
-    implementation 'com.arkflame:arkflame-drm-client:0.6.4'
+    implementation 'com.arkflame:arkflame-drm-client:0.6.6'
 }
 ```
 
@@ -94,7 +94,7 @@ The library embeds `%%__NONCE__%%` as a literal. BuiltByBit must replace this pl
 
 The library compiles for Java 8. It has zero required Bukkit compile dependencies; optional v2 event hooks access Bukkit through reflective adapters. Network calls never run from Bukkit tick callbacks. Entity-owned Folia behavior must be verified on a live Folia server before claiming compatibility; this package does not add new unsafe runtime API references.
 
-## BuiltByBit optional provider / resilience (v0.6.4)
+## BuiltByBit optional provider / resilience (v0.6.5)
 
 A BuiltByBit token is **not required** to integrate or operate ArkFlame DRM. With `BBB_EMBED_TOKEN=` blank on the backend, no BuiltByBit API request is sent, reporting and opt-in dashboard telemetry continue, and the Licensing panel shows **Provider not configured**. Manual review works. A literal watermark placeholder not injected by the marketplace results in no nonce; this is not proof of a cracked plugin.
 

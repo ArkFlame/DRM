@@ -19,7 +19,7 @@ export function snapshotWriter(file, getState) {
       tmp = `${file}.${randomUUID()}.tmp`;
       // Flush the staged bytes before an atomic replacement. The directory sync then
       // makes the rename durable across a host crash on supported local filesystems.
-      const staged = await open(tmp, 'wx', 0o600);
+      const staged = await open(/*turbopackIgnore: true*/ tmp, 'wx', 0o600);
       try { await staged.writeFile(snapshot, 'utf8'); await staged.sync(); }
       finally { await staged.close(); }
       await rename(tmp, file);

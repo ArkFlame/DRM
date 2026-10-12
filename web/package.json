@@ -1,7 +1,7 @@
 {
   "name": "arkflame-drm",
   "private": true,
-  "version": "0.6.4",
+  "version": "0.6.6",
   "engines": {
     "node": ">=20.9.0"
   },

@@ -1,4 +1,4 @@
-# ArkFlame DRM v0.6.4 — production verification and release gates
+# ArkFlame DRM v0.6.5 — production verification and release gates
 
 **Source:** v0.6.2 production-readiness audit (43 items) plus v0.6.3 source changes and locally executed tests. This release contains **implemented hardening**, not a completed public production deployment. The items below preserve all audit work and mark unverified host/customer/provider gates explicitly. Runtime evidence always outranks this checklist.
 
@@ -11,11 +11,11 @@
 
 ## Critical public-launch gates (P0)
 
-| Audit ID | v0.6.4 state | Exact remaining proof |
+| Audit ID | v0.6.5 state | Exact remaining proof |
 |---|---|---|
 | P0-01 Native build | BLOCKED: Maven CLI absent; Next.js deps unavailable here | Native `./scripts/build.sh` exit 0 and deployed standalone smoke test |
 | P0-02 Lockfile | PARTIAL: missing lockfile now triggers automatic generator + strict `npm ci`; the archive still lacks a real lockfile because registry access timed out here | On a networked build host, run build to generate, review/commit lockfile, verify `npm ci` and audit dependencies/licenses |
-| P0-03 Canonical Maven version | BLOCKED: offline Java 8 JAR only; no immutable 0.6.4 publication | Maven package + external Gradle/Maven resolution of exact checksums |
+| P0-03 Canonical Maven version | BLOCKED: offline Java 8 JAR only; no immutable 0.6.5 publication | Maven package + external Gradle/Maven resolution of exact checksums |
 | P0-04 Real consumer plugin | UNVERIFIED: no actual ArkFlame consumer sources or runtime here | Shade/relocate complete JAR into built plugin; test `onEnable` and HTTP |
 | P0-05 Spigot/Paper 1.8–1.21 | PARTIAL: fake old/modern host shape tests and Java 8 build | Real server-version matrix, restart, player lifecycle and performance |
 | P0-06 Folia | PARTIAL: scheduler reflection in existing client | Live Folia tests of full consuming plugin; only then mark `folia-supported: true` |

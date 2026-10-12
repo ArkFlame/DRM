@@ -1,6 +1,7 @@
 import { boundedJson } from '@/lib/bounded-json.mjs';
 import { NextRequest, NextResponse } from 'next/server';
 import { COOKIE_NAME, createSession, sameOrigin, validPassword } from '@/lib/auth';
+import { secureCookieForRequest } from '@/lib/auth-validation.mjs';
 const attempts = new Map<string, { count: number; since: number }>();
 export async function POST(req: NextRequest) {
   if (!sameOrigin(req)) return NextResponse.json({ error: 'invalid_origin' }, { status: 403 });
@@ -20,6 +21,7 @@ export async function POST(req: NextRequest) {
   if (!validPassword(password)) return NextResponse.json({ error: 'invalid_credentials' }, { status: 401 });
   attempts.delete(ip);
   const response = NextResponse.json({ ok: true });
-  response.cookies.set(COOKIE_NAME, createSession(), { httpOnly: true, sameSite: 'strict', secure: process.env.DRM_SECURE_COOKIE !== 'false' && (process.env.NODE_ENV === 'production'), path: '/', maxAge: 8 * 3600 });
+  const secureOverride = process.env.DRM_SECURE_COOKIE;
+  response.cookies.set(COOKIE_NAME, createSession(), { httpOnly: true, sameSite: 'strict', secure: secureCookieForRequest(req, process.env.NODE_ENV === 'production', process.env.DRM_TRUST_PROXY === 'true', secureOverride === undefined ? undefined : secureOverride === 'true'), path: '/', maxAge: 8 * 3600 });
   return response;
 }

@@ -1,6 +1,6 @@
 plugins { id 'java-library'; id 'maven-publish' }
 group = 'com.arkflame'
-version = '0.6.4'
+version = '0.6.6'
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8'; options.release = 8 }

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.5 — Administrator login and environment loading
+- Existing administrator passwords are matched exactly, including values shorter than 20 characters and values with punctuation/whitespace. Empty/unset passwords remain invalid.
+- Login origin validation accepts the configured origin or the actual incoming host when its scheme is established by a trusted proxy; cross-site origins remain rejected.
+- `start.sh` uses the Node.js env-file loader instead of shell evaluation, preserving literal password characters and avoiding shell command execution from `.env` contents.
+- The login page distinguishes invalid credentials from origin and rate-limit failures; authentication/origin regressions and startup safety tests added.
+
 ## 0.6.4 — Automatic build and first-start bootstrap
 - A missing `web/package-lock.json` now triggers `scripts/generate-lockfile.sh` automatically during `scripts/build.sh`; dependencies still install reproducibly through `npm ci`. Registry connectivity is required to generate a real lockfile.
 - `scripts/start.sh` builds before launching if no complete current-version standalone application exists. Build failures stop startup; an existing successful build starts directly.

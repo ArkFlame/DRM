@@ -6,7 +6,7 @@ export default function Login() {
   async function submit(e: FormEvent) {
     e.preventDefault(); setBusy(true); setError('');
     try { const r = await fetch('/api/auth/login', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({password}) });
-      if (!r.ok) throw Error(r.status === 429 ? 'Too many attempts. Try again later.' : 'Invalid password or server configuration.');
+      if (!r.ok) throw Error(r.status === 429 ? 'Too many attempts. Try again in a minute.' : r.status === 403 ? 'Login origin rejected. Check DRM_PUBLIC_ORIGIN and your reverse proxy Host/HTTPS settings.' : r.status === 401 ? 'Incorrect password. Use the exact DRM_WEB_PASSWORD in web/.env.' : 'Login service unavailable. Check server logs.');
       window.location.assign('/');
     } catch (e) { setError(e instanceof Error ? e.message : 'Login failed'); setBusy(false); }
   }
