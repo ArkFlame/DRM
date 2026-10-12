@@ -4,9 +4,14 @@ cd "$(dirname "$0")/.."
 command -v mvn >/dev/null || { echo 'Maven CLI missing: install Maven 3.9+ (no wrapper)' >&2; exit 2; }
 command -v npm >/dev/null || { echo 'npm CLI missing' >&2; exit 2; }
 if [ ! -f web/package-lock.json ]; then
-  echo 'Missing web/package-lock.json; generate and review it on a networked development host with ./scripts/generate-lockfile.sh before a reproducible production build.' >&2
-  exit 2
+  echo 'Missing web/package-lock.json; generating the dependency lockfile automatically (npm registry access may be required).' >&2
+  if ! ./scripts/generate-lockfile.sh; then
+    echo 'Dependency lockfile generation failed; check npm registry access and retry ./scripts/build.sh.' >&2
+    exit 2
+  fi
 fi
+# An interrupted build must not be mistaken for a completed release by start.sh.
+rm -f web/.next/standalone/.build-complete
 ./scripts/init-env.sh
 mkdir -p dist
 # Preserve data and credentials. Only reproducible output directories are replaced.
@@ -36,4 +41,6 @@ cp -a web/.next/static web/.next/standalone/.next/
 cp -a web/public web/.next/standalone/
 # Do not delete Maven target unless ALL steps passed.
 rm -rf client/target
+release_version="${client_jar#arkflame-drm-client-}"
+printf 'version=%s\n' "${release_version%.jar}" > web/.next/standalone/.build-complete
 printf 'BUILD_PASS=1\n'

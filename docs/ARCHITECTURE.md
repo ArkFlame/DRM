@@ -1,4 +1,4 @@
-# ArkFlame DRM architecture v0.6.3
+# ArkFlame DRM architecture v0.6.4
 
 ## Components and authority
 
@@ -45,12 +45,13 @@ drm.arkflame.com / Next.js App Router (one Node process)
 ## Artifact supply chain
 
 - Maven project: `client/pom.xml`; optional native Gradle project: `client/build.gradle` (no wrappers).
-- `scripts/build.sh`: native Maven package, Java behavior tests + Java-to-Node JSON exchange, Node tests, TypeScript check, Next production build; **only then** immutable Maven publication, standalone static copy, and Maven target cleanup. A failed test/build must never expose a half-verified release.
+- `scripts/build.sh`: generates a missing npm lockfile through the existing generator (needs registry connectivity); uses locked `npm ci`; native Maven package, Java behavior tests + Java-to-Node JSON exchange, Node tests, TypeScript check, Next production build; **only then** immutable Maven publication, standalone static copy, and Maven target cleanup. A failed test/build must never expose a half-verified release.
 - `scripts/publish-maven.py`: `dist/maven/com/arkflame/arkflame-drm-client/0.4.0/*.jar|pom|sha1|sha256`; mirrored to `web/public/maven` for `https://drm.arkflame.com/maven/`.
 - Version coordinates must be immutable once published. Preserve old version directories for existing customer builds. Do not publish Java tests or raw administrative secrets inside JARs.
 
 ## Remaining pre-deployment gates
 
+- `scripts/start.sh` checks `server.js` and a versioned completion marker; if either is absent or stale, it invokes the full build and fails closed when the build cannot complete. Existing credentials and user data remain untouched.
 - Install external native Maven and npm dependencies; run `./scripts/build.sh` on internet-connected build host. Validate `npm run typecheck`, `next build` and generated `package-lock.json`.
 - Launch one Next process behind trusted HTTPS; test login, operations, public ingests, Java client restart/quit, published Maven/Gradle dependency resolution and real Bukkit/Paper/Folia runtimes.
 - Create external durable DB before multi-process production. Replace single password with MFA/identity proxy if administrator access is public and not VPN-restricted.

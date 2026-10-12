@@ -20,7 +20,7 @@ final class ClientHttp {
             connection.setInstanceFollowRedirects(false);
             connection.setUseCaches(false);
             connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
-            connection.setRequestProperty("User-Agent", "ArkFlameDRM/0.6.3");
+            connection.setRequestProperty("User-Agent", "ArkFlameDRM/0.6.4");
             connection.setFixedLengthStreamingMode(bytes.length);
             try (OutputStream output = connection.getOutputStream()) { output.write(bytes); }
             return connection.getResponseCode();

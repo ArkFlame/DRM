@@ -1,4 +1,4 @@
-# Production operations (v0.6.3)
+# Production operations (v0.6.4)
 
 **Deploy status:** These are reference procedures, NOT evidence of a completed deployment or restore drill. Adjust service user, paths, Node binary, certificate manager and network policy on the actual host. Never expose the Next process directly to the internet.
 
@@ -21,7 +21,7 @@
 
 ## Release gates
 
-- Use `./scripts/build.sh` on a provisioned build host with native Maven, npm and network connectivity. Generate and commit `web/package-lock.json` with approved versions; do not publish offline JARs into immutable Maven coordinates.
+- Use `./scripts/build.sh` on a provisioned host with native Maven, npm and network connectivity. A missing `web/package-lock.json` is generated automatically by the script; inspect and commit it for repeatable builds. `./scripts/start.sh` also builds automatically when the standalone output is absent/incomplete/stale, but for supervised production services prefer a prebuilt release to avoid compiling at boot. Do not publish offline JARs into immutable Maven coordinates.
 - Test against real Spigot 1.8, modern Paper and Folia server distributions using a real shaded consumer plugin. A Java-8 compile is not runtime proof.
 - Test an actual BuiltByBit purchase/download and rights lookup using a least-scope token. With no token, the dashboard shows **Provider not configured**; telemetry continues, rights remain unknown, and no plugin is disabled.
 - Keep privacy and BuiltByBit dependency disclosures accurate and published before processing customer observations. Follow `docs/PRODUCTION-GATES.md`.

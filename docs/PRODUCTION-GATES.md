@@ -1,4 +1,4 @@
-# ArkFlame DRM v0.6.3 — production verification and release gates
+# ArkFlame DRM v0.6.4 — production verification and release gates
 
 **Source:** v0.6.2 production-readiness audit (43 items) plus v0.6.3 source changes and locally executed tests. This release contains **implemented hardening**, not a completed public production deployment. The items below preserve all audit work and mark unverified host/customer/provider gates explicitly. Runtime evidence always outranks this checklist.
 
@@ -11,11 +11,11 @@
 
 ## Critical public-launch gates (P0)
 
-| Audit ID | v0.6.3 state | Exact remaining proof |
+| Audit ID | v0.6.4 state | Exact remaining proof |
 |---|---|---|
 | P0-01 Native build | BLOCKED: Maven CLI absent; Next.js deps unavailable here | Native `./scripts/build.sh` exit 0 and deployed standalone smoke test |
-| P0-02 Lockfile | PARTIAL: fail-closed `npm ci` release gate; generator added. `web/package-lock.json` **missing** | Generate, inspect, commit lockfile and `npm ci`; audit dependencies/licenses |
-| P0-03 Canonical Maven version | BLOCKED: offline Java 8 JAR only; no immutable 0.6.3 publication | Maven package + external Gradle/Maven resolution of exact checksums |
+| P0-02 Lockfile | PARTIAL: missing lockfile now triggers automatic generator + strict `npm ci`; the archive still lacks a real lockfile because registry access timed out here | On a networked build host, run build to generate, review/commit lockfile, verify `npm ci` and audit dependencies/licenses |
+| P0-03 Canonical Maven version | BLOCKED: offline Java 8 JAR only; no immutable 0.6.4 publication | Maven package + external Gradle/Maven resolution of exact checksums |
 | P0-04 Real consumer plugin | UNVERIFIED: no actual ArkFlame consumer sources or runtime here | Shade/relocate complete JAR into built plugin; test `onEnable` and HTTP |
 | P0-05 Spigot/Paper 1.8–1.21 | PARTIAL: fake old/modern host shape tests and Java 8 build | Real server-version matrix, restart, player lifecycle and performance |
 | P0-06 Folia | PARTIAL: scheduler reflection in existing client | Live Folia tests of full consuming plugin; only then mark `folia-supported: true` |
@@ -58,8 +58,8 @@ P2-01 notifications; P2-02 evidence timelines; P2-03 product/resource registry (
 
 ## Ready-to-execute release checklist
 
-1. On a connected build host, run `./scripts/generate-lockfile.sh`; review and commit `web/package-lock.json`; run dependency vulnerability/license review. No invented lockfile is included.
-2. Execute `./scripts/build.sh`, verifying Maven JAR bytecode, all Java/Node tests, `npm ci`, TS typecheck, Next.js `next build`, and public Maven repository publication only after success.
+1. On a connected build host with Maven and npm, run `./scripts/build.sh` directly or `./scripts/start.sh` for automatic first-run build. The missing `web/package-lock.json` is generated automatically. Inspect and commit it after generation, then run dependency vulnerability/license review. This archive does not include an invented lockfile.
+2. Verify `./scripts/build.sh` exits 0 and startup uses only the completed current-release marker; check Maven JAR bytecode, all Java/Node tests, `npm ci`, TS typecheck, Next.js `next build`, and public Maven repository publication only after success.
 3. Start a disposable instance using `./scripts/start.sh`, verify login, session logout, proxy IP, 24h charts, node filters and manual actions in Chromium mobile/desktop (using test data).
 4. Test Java 8/modern API consumers against real Bukkit 1.8.8, Spigot 1.13.x, Paper 1.16.x/1.20.x/1.21.x and current Folia releases. No universal Folia main thread assumptions.
 5. Test BuiltByBit with a creator token of minimum scope and a watermark-injected purchaser download; before claiming **product license verification**, implement authoritative product-resource binding.

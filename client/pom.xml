@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.arkflame</groupId>
   <artifactId>arkflame-drm-client</artifactId>
-  <version>0.6.3</version>
+  <version>0.6.4</version>
   <name>ArkFlame DRM Client</name>
   <packaging>jar</packaging>
   <properties>

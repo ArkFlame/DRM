@@ -1,4 +1,4 @@
-# ArkFlame DRM v0.6.3
+# ArkFlame DRM v0.6.4
 
 One Java 8 client library + one Next.js application. Advisory-only telemetry and BuiltByBit entitlement observations. No remote shutdowns, automatic bans, or forced licensing dependency. Identifiable extended telemetry requires server-owner opt-in.
 
@@ -19,9 +19,8 @@ previews/  Illustrative UI HTML fixtures, render helper and preview PNGs (synthe
 
 ```bash
 ./scripts/init-env.sh   # only if web/.env does not already exist; will NOT reset existing password
-./scripts/generate-lockfile.sh  # run on connected host, inspect and commit the generated web/package-lock.json
-./scripts/build.sh      # requires native Maven + reviewed npm lockfile; does NOT fall back to unlocked npm install
-./scripts/start.sh      # start Next.js behind HTTPS proxy on 127.0.0.1:3000
+./scripts/build.sh      # auto-generates a missing npm lockfile; requires Maven, Node/npm, npm registry access on first build
+./scripts/start.sh      # auto-builds if missing/stale; starts Next.js on 127.0.0.1:3000
 ```
 
 **Admin login:** `https://drm.arkflame.com/login`. Recover your generated password with:
@@ -37,9 +36,9 @@ grep '^DRM_WEB_PASSWORD=' web/.env
 ## Integrate from Maven/Gradle
 
 Repository: `https://drm.arkflame.com/maven/`  
-Coordinates: `com.arkflame:arkflame-drm-client:0.6.3`
+Coordinates: `com.arkflame:arkflame-drm-client:0.6.4`
 
-**IMPORTANT:** The v0.6.3 offline-compiled JAR in `dist/` is provided for local evaluation. To publish v0.6.3 at `/maven/`, run `./scripts/build.sh` on a host with Maven and npm access. This produces the canonical Maven JAR and publishes it once; do not manually publish the offline JAR first. Public repository access requires deployment of the site. Read `docs/INTEGRATION.md` for copy-paste Maven/Gradle dependency and shade examples. The library must be bundled/relocated into your distributed Minecraft plugin; Maven/Gradle compile dependency alone does not ship it.
+**IMPORTANT:** The v0.6.4 offline-compiled JAR in `dist/` is provided for local evaluation. To publish v0.6.4 at `/maven/`, run `./scripts/build.sh` on a host with Maven and npm access. This produces the canonical Maven JAR and publishes it once; do not manually publish the offline JAR first. Public repository access requires deployment of the site. Read `docs/INTEGRATION.md` for copy-paste Maven/Gradle dependency and shade examples. The library must be bundled/relocated into your distributed Minecraft plugin; Maven/Gradle compile dependency alone does not ship it.
 
 At plugin startup (exact `plugin.yml` name is used as product identity):
 
@@ -64,6 +63,8 @@ Backend data moves from old `backend/data/*` into `web/data/drm.json` and `web/d
 This release is an **evaluation build, not a fully production-verified deployment**. See [docs/PRODUCTION-GATES.md](docs/PRODUCTION-GATES.md) for the 43-item audit outcome, [deploy/OPERATIONS.md](deploy/OPERATIONS.md) for backup/restore and service steps, and [docs/PRIVACY-DISCLOSURE-TEMPLATE.md](docs/PRIVACY-DISCLOSURE-TEMPLATE.md) for a draft disclosure that must be reviewed and published. BuiltByBit configuration is optional: when `BBB_EMBED_TOKEN=` is empty, reports still work and license checks explicitly show `NOT_CONFIGURED`. No product-specific license claim is made from nonce-only evidence.
 
 ## Verification
+
+If `web/package-lock.json` is missing, `build.sh` invokes `generate-lockfile.sh` automatically and then uses `npm ci`. Review and commit the generated lockfile after the first successful dependency resolution. Subsequent builds use that lockfile. `start.sh` runs the same build automatically if no completed standalone output for the current release exists. Existing `web/.env` and `web/data` are preserved. A failed build prevents startup, and no incomplete release is marked ready. Maven and npm registry access are still prerequisites, not automatically installed.
 
 `./scripts/build.sh` must run Maven package, Java integration test mains, native Node tests, TypeScript check, Next.js production build, and copy the static public repo into Next standalone output. Only after every stage succeeds does it remove `client/target`.
 
@@ -94,5 +95,7 @@ See `docs/ARCHITECTURE.md` for service ownership, threading, build, telemetry, a
 **v0.6.1 pass:** Reject conflicting storage-file paths and invalid direct source IPs. Validate persisted policy/audit identifiers and protect node/player lookups from inherited object members. Clearing a manual override now removes the redundant policy entry while retaining the audit; repeated decisions avoid duplicate audits and full-graph writes. Seven new Node regressions; no wire protocol, schema, UI, or Java API changes.
 
 **v0.6.2 pass:** At the 50,000-session ceiling, a new reporting session reclaims the oldest stopped session only; a full active-session store still returns 429. The node and historical player records remain. Repeating an unchanged v1 manual review does not append duplicate audits or rewrite storage. Added session-capacity and idempotence regressions. Under a fully saturated store, reclaiming stopped sessions can reduce session-level historical detail (including historical product associations and uptime estimates); node and player records are retained. No wire protocol or Java API changes.
+
+**v0.6.4 pass:** Fixed missing-lockfile and missing-build startup failures. Builds automatically generate a missing real npm lockfile on a connected host (no fabricated dependency tree), then use `npm ci` and run Java/backend/frontend gates. `start.sh` triggers the build if the web server or current-version completion marker is missing; a failed build cannot launch the web server. Eight automatic-build regressions cover existing/missing/stale builds and failure paths. Maven and npm registry are required for first-time bootstrap; they are not silently installed. Full production compilation remains unverified in this environment.
 
 **v0.6.3 pass:** BuiltByBit is optional: missing `BBB_EMBED_TOKEN` does not break startup or telemetry and is displayed as **NOT CONFIGURED** in review/settings. Nonce-only rights are never claimed as product-specific license proof; cross-product rights propagation is removed. Java v1 reports use bounded asynchronous retries on transport failure, 429 or 5xx without delaying v2 initialization. Snapshot writes synchronize staged bytes and containing directory. Added private operational counters, guarded offline backup/restore, systemd deployment sample, reproducible lockfile gate and live-launch checklist. **A complete production build is still blocked until a real npm lockfile is generated and the Maven/Next.js/marketplace/server matrix is verified.** See `docs/PRODUCTION-GATES.md` and `deploy/OPERATIONS.md`.

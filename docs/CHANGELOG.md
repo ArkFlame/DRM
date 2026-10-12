@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.4 — Automatic build and first-start bootstrap
+- A missing `web/package-lock.json` now triggers `scripts/generate-lockfile.sh` automatically during `scripts/build.sh`; dependencies still install reproducibly through `npm ci`. Registry connectivity is required to generate a real lockfile.
+- `scripts/start.sh` builds before launching if no complete current-version standalone application exists. Build failures stop startup; an existing successful build starts directly.
+- Introduced a versioned completion marker written only after all build/test/publication/copy steps have succeeded. Stale and incomplete outputs are rebuilt rather than served.
+- Added eight end-to-end shell fixture regressions for missing/present lockfiles, failed dependency resolution, first start, stale output, and fail-closed startup.
+- No Bukkit, telemetry, storage schema, privacy, or license enforcement changes.
+
+
 ## 0.6.3 — Operational hardening and optional BuiltByBit support
 - Missing `BBB_EMBED_TOKEN` is explicitly reported as **not configured**; no provider API calls occur. Startup and opt-in telemetry remain active.
 - Nonce-only rights results are scoped to each claimed product and never represented as cryptographically verified product ownership; no automatic enforcement.
